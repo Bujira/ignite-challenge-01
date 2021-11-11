@@ -16,7 +16,7 @@ function cehckUserExists(request, response, next) {
   const userExists = users.find((user) => user.username === username);
 
   if (!userExists) {
-    return response.status(400).json({ error: "User not found!" });
+    return response.status(404).json({ error: "User not found!" });
   }
 
   request.user = userExists;
@@ -26,6 +26,12 @@ function cehckUserExists(request, response, next) {
 
 app.post('/users', (request, response) => {
   const { name, username } = request.body;
+
+  const userExists = users.find((user) => user.username === username);
+
+  if (userExists) {
+    return response.status(400).json({ error: "User already exists!" });
+  }
 
   const newUser = {
     id: uuid(),
@@ -69,6 +75,10 @@ app.put('/todos/:id', cehckUserExists, (request, response) => {
 
   const todo = user.todos.find((todo) => todo.id === id);
 
+  if (!todo) {
+    return response.status(404).json({ error: "To-Do does not exist!" })
+  }
+
   todo.title = title;
   todo.deadline = new Date(deadline);
 
@@ -81,13 +91,28 @@ app.patch('/todos/:id/done', cehckUserExists, (request, response) => {
 
   const todo = user.todos.find((todo) => todo.id === id);
 
+  if (!todo) {
+    return response.status(404).json({ error: "To-Do does not exist!" })
+  }
+
   todo.done = true;
 
   return response.status(200).json(todo);
 });
 
 app.delete('/todos/:id', cehckUserExists, (request, response) => {
-  // Complete aqui
+  const { user } = request;
+  const { id } = request.params;
+
+  const todoIndex = user.todos.findIndex((todo) => todo.id === id);
+
+  if (todoIndex === -1) {
+    return response.status(404).json({ error: "To-Do does not exist!" })
+  }
+
+  user.todos.splice(todoIndex, 1);
+
+  return response.status(204).json();
 });
 
 module.exports = app;
