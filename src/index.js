@@ -76,7 +76,14 @@ app.put('/todos/:id', cehckUserExists, (request, response) => {
 });
 
 app.patch('/todos/:id/done', cehckUserExists, (request, response) => {
-  // Complete aqui
+  const { user } = request;
+  const { id } = request.params;
+
+  const todo = user.todos.find((todo) => todo.id === id);
+
+  todo.done = true;
+
+  return response.status(200).json(todo);
 });
 
 app.delete('/todos/:id', cehckUserExists, (request, response) => {
