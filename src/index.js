@@ -29,8 +29,12 @@ app.post('/users', (request, response) => {
   return response.status(201).json(newUser);
 });
 
-app.get('/todos', cehckUserExists, (request, response) => {
-  // Complete aqui
+app.get('/todos', (request, response) => {
+  const { username } = request.headers;
+
+  const user = users.find((user) => user.username === username);
+
+  return response.status(200).json(user.todos);
 });
 
 app.post('/todos', cehckUserExists, (request, response) => {
