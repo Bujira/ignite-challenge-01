@@ -11,7 +11,17 @@ app.use(express.json());
 const users = [];
 
 function cehckUserExists(request, response, next) {
-  // Complete aqui
+  const { username } = request.headers;
+
+  const userExists = users.find((user) => user.username === username);
+
+  if (!userExists) {
+    return response.status(400).json({ error: "User not found!" });
+  }
+
+  request.user = userExists;
+
+  return next();
 }
 
 app.post('/users', (request, response) => {
@@ -29,10 +39,8 @@ app.post('/users', (request, response) => {
   return response.status(201).json(newUser);
 });
 
-app.get('/todos', (request, response) => {
-  const { username } = request.headers;
-
-  const user = users.find((user) => user.username === username);
+app.get('/todos', cehckUserExists, (request, response) => {
+  const { user } = request;
 
   return response.status(200).json(user.todos);
 });
