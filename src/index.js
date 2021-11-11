@@ -46,7 +46,20 @@ app.get('/todos', cehckUserExists, (request, response) => {
 });
 
 app.post('/todos', cehckUserExists, (request, response) => {
-  // Complete aqui
+  const { user } = request;
+  const { title, deadline } = request.body;
+
+  const newToDo = {
+    id: uuid(),
+    title,
+    done: false,
+    deadline: new Date(deadline),
+    created_at: new Date()
+  }
+
+  user.todos.push(newToDo);
+
+  return response.status(201).json(newToDo);
 });
 
 app.put('/todos/:id', cehckUserExists, (request, response) => {
